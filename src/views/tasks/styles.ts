@@ -1,0 +1,55 @@
+import { StyleSheet } from "react-native";
+
+export default StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 12,
+    },
+    header: { fontSize: 20, fontWeight: "700", marginBottom: 12 },
+    row: {
+        flexDirection: "row",
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderColor: "#eee",
+    },
+    info: { flex: 1 },
+    name: { fontSize: 16 },
+    finished: { textDecorationLine: "line-through", color: "#888" },
+    desc: { color: "#666" },
+    meta: { color: "#999", marginTop: 6 },
+    actions: { justifyContent: "center", alignItems: "center", gap: 8 },
+    deleteBtn: {
+        marginTop: 8,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        backgroundColor: "#ff3b30",
+        borderRadius: 6,
+    },
+    deleteTxt: { color: "#fff" },
+    empty: { textAlign: "center", marginTop: 20, color: "#666" },
+    form: {
+        marginTop: 12,
+        borderTopWidth: 1,
+        borderColor: "#eee",
+        paddingTop: 12,
+    },
+    formTitle: { fontWeight: "600", marginBottom: 8 },
+    input: {
+        borderWidth: 1,
+        borderColor: "#ddd",
+        padding: 8,
+        borderRadius: 6,
+        marginBottom: 8,
+    },
+    textarea: { minHeight: 60, textAlignVertical: "top" },
+    formLabel: { marginBottom: 6, color: "#333" },
+    listChip: {
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        backgroundColor: "#f0f0f0",
+        borderRadius: 20,
+        marginRight: 8,
+    },
+    listChipActive: { backgroundColor: "#007aff" },
+    listChipText: { color: "#000" },
+});
