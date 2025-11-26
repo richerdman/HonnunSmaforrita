@@ -2,12 +2,14 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, FlatList, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import {
-    createTask,
-    deleteTask,
-    getListById,
-    getTasksByList,
-    Task,
-    toggleTaskFinished,
+  createTask,
+  deleteTask,
+  getListById,
+  getLists,
+  getTasksByList,
+  moveTask,
+  Task,
+  toggleTaskFinished,
 } from '../../src/services/taskService';
 import styles from '../../src/views/tasks/styles';
 
@@ -16,6 +18,7 @@ export default function TasksForList() {
   const listId = Number(params.listId ?? NaN);
 
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [moveTaskId, setMoveTaskId] = useState<number | null>(null);
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
 
@@ -72,6 +75,9 @@ export default function TasksForList() {
             </View>
             <View style={styles.actions}>
               <Switch value={item.isFinished} onValueChange={() => onToggle(item.id)} />
+              <TouchableOpacity onPress={() => setMoveTaskId(item.id)} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
+                <Text style={{ color: '#007aff' }}>Move</Text>
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.deleteBtn}>
                 <Text style={styles.deleteTxt}>Delete</Text>
               </TouchableOpacity>
@@ -80,6 +86,27 @@ export default function TasksForList() {
         )}
         ListEmptyComponent={<Text style={styles.empty}>No tasks in this list.</Text>}
       />
+
+      {moveTaskId && (
+        <View style={{ padding: 8, backgroundColor: '#f8f8f8', borderRadius: 8, marginTop: 8 }}>
+          <Text style={{ fontWeight: '700', marginBottom: 6 }}>Move task to...</Text>
+          {getLists()
+            .filter((l) => l.id !== listId)
+            .map((l) => (
+              <TouchableOpacity
+                key={l.id}
+                onPress={() => {
+                  moveTask(moveTaskId, l.id);
+                  setMoveTaskId(null);
+                  refresh();
+                }}
+                style={{ paddingVertical: 6 }}>
+                <Text>{l.name}</Text>
+              </TouchableOpacity>
+            ))}
+          <Button title="Cancel" onPress={() => setMoveTaskId(null)} />
+        </View>
+      )}
 
       <View style={styles.form}>
         <TextInput placeholder="Name" value={newName} onChangeText={setNewName} style={styles.input} />
