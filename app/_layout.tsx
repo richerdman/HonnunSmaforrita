@@ -1,6 +1,5 @@
-import { Stack } from 'expo-router';
-import { COLORS } from '../constants/theme';
-
+import { Stack } from "expo-router";
+import { COLORS } from "../constants/theme";
 
 // defines what header bar looks like, which screens exist, their titles and the navigation structure
 export default function Layout() {
@@ -12,13 +11,18 @@ export default function Layout() {
                 },
                 headerTintColor: COLORS.white,
                 headerTitleStyle: {
-                    fontWeight: 'bold',
+                    fontWeight: "bold",
                 },
             }}
         >
-        <Stack.Screen name="index" options={{ title: 'Homepage' }} />
-        <Stack.Screen name="boards" options={{ title: 'All Boards' }} />
-        <Stack.Screen name="createBoard" options={{ title: 'Create Board' }} />
+            <Stack.Screen name="index" options={{ title: "Homepage" }} />
+            <Stack.Screen name="boards" options={{ title: "All Boards" }} />
+            <Stack.Screen
+                name="createBoard"
+                options={{ title: "Create Board" }}
+            />
+			<Stack.Screen name="lists" options={{ title: "Lists" }} />
+			<Stack.Screen name="tasks/[listId]" options={{ title: "Tasks" }} />
         </Stack>
     );
 }
