@@ -1,17 +1,18 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { COLORS, FONT_SIZES, SPACING } from "../constants/theme";
-import type { Task } from "../src/services/taskService";
+import type { Task } from "../services/taskService";
 
 type Props = {
   task: Task;
   listColor?: string;
   onToggle: (id: number) => void;
   onMove: () => void;
+  onEdit?: () => void;
   onDelete: () => void;
 };
 
-export default function TaskCard({ task, listColor = COLORS.primary, onToggle, onMove, onDelete }: Props) {
+export default function TaskCard({ task, listColor = COLORS.primary, onToggle, onMove, onEdit, onDelete }: Props) {
   return (
     <View style={[styles.card, { borderLeftColor: listColor }]}>      
       <View style={styles.left}>
@@ -36,6 +37,13 @@ export default function TaskCard({ task, listColor = COLORS.primary, onToggle, o
         <TouchableOpacity onPress={onMove} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
           <Text style={{ color: "#007aff" }}>Move</Text>
         </TouchableOpacity>
+        
+        {onEdit ? (
+          <TouchableOpacity onPress={onEdit} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
+            <Text style={{ color: "#007aff" }}>Edit</Text>
+          </TouchableOpacity>
+        ) : null}
+
         <TouchableOpacity onPress={onDelete} style={styles.deleteBtn}>
           <Text style={styles.deleteTxt}>Delete</Text>
         </TouchableOpacity>
