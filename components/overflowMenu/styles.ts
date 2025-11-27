@@ -29,7 +29,6 @@ export default StyleSheet.create({
     elevation: 12,
     zIndex: 9999,
     padding: 0,
-    // allow shadow to be visible; inner content will handle clipping
     overflow: 'visible',
   },
   menuInner: {
