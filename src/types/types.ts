@@ -6,10 +6,10 @@ export type Board = {
 }
 
 export interface List {
-  id: number;
-  name: string;
-  color: string;
-  boardId: number;
+    id: number;
+    name: string;
+    color: string;
+    boardId: number;
 }
 
 export type RootStackParamList = {
