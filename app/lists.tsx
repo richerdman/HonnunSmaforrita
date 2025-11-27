@@ -97,7 +97,6 @@ export default function ListsRoute() {
         <View style={styles.container}>
         <Text style={styles.title}>Lists for this board</Text>
 
-
         <FlatList
             data={lists}
             keyExtractor={(item) => item.id.toString()}
