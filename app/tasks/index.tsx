@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
-import TasksForList from "../../components/TasksForList";
-import { SPACING } from "../../constants/theme";
-import { getLists } from "../../services/taskService";
-import styles from "../../views/tasks/styles";
+import TasksForList from "../../src/components/TasksForList";
+import { SPACING } from "../../src/constants/theme";
+import { getLists } from "../../src/services/taskService";
+import styles from "../../src/views/tasks/styles";
 
 export const screenOptions = { title: "Tasks" } as const;
 

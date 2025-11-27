@@ -1,9 +1,9 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
-import Button from "../../components/button";
-import TaskCard from "../../components/TaskCard";
-import { SPACING } from "../../constants/theme";
+import Button from "../../src/components/button";
+import TaskCard from "../../src/components/TaskCard";
+import { SPACING } from "../../src/constants/theme";
 import {
     createTask,
     deleteTask,
@@ -13,8 +13,8 @@ import {
     moveTask,
     Task,
     toggleTaskFinished,
-} from "../../services/taskService";
-import styles from "../../views/tasks/styles";
+} from "../../src/services/taskService";
+import styles from "../../src/views/tasks/styles";
 
 export default function TasksForList() {
     const params = useLocalSearchParams<{ listId?: string }>();

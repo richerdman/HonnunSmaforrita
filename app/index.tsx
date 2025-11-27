@@ -1,8 +1,8 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Button from "../components/button";
-import { COLORS, FONT_SIZES, SPACING } from "../constants/theme";
+import Button from "../src/components/button";
+import { COLORS, FONT_SIZES, SPACING } from "../src/constants/theme";
 
 export default function HomeScreen() {
 	const router = useRouter();

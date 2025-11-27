@@ -1,6 +1,6 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle} from "react-native";
-import { COLORS, SPACING, FONT_SIZES } from "../constants/theme";
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
+import { COLORS, FONT_SIZES, SPACING } from "../constants/theme";
 
 
 type ButtonProps = {

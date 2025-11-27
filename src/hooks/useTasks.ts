@@ -3,9 +3,9 @@ import {
   Task,
   getTasksByList,
   createTask as svcCreateTask,
-  toggleTaskFinished as svcToggle,
-  moveTask as svcMove,
   deleteTask as svcDelete,
+  moveTask as svcMove,
+  toggleTaskFinished as svcToggle,
 } from '../services/taskService';
 
 export function useTasks(listId: number) {
