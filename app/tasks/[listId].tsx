@@ -2,7 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Button from "../../components/button";
-import TaskCard from "../../components/TaskCard";
+import TaskCard from "../../components/taskCard/TaskCard";
 import { SPACING } from "../../constants/theme";
 import { useTasks } from "../../hooks/useTasks";
 import { getListById, getLists } from "../../services/taskService";

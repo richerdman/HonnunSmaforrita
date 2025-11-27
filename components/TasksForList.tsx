@@ -13,7 +13,7 @@ import type { Task } from "../services/taskService";
 import { getListById, getLists } from "../services/taskService";
 import styles from "../views/tasks/styles";
 import Button from "./button";
-import TaskCard from "./TaskCard";
+import TaskCard from "./taskCard/TaskCard";
 
 type Props = { listId: number; showHeader?: boolean };
 
@@ -26,17 +26,6 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
     const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
     const list = getListById(listId);
-
-    function onCreate() {
-        if (!newName.trim()) return;
-        createTask({
-            name: newName.trim(),
-            description: newDescription.trim(),
-        });
-        setNewName("");
-        setNewDescription("");
-        setOpenForm(false);
-    }
 
     function onSubmitForm() {
         if (!newName.trim()) return;
