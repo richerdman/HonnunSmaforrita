@@ -1,3 +1,4 @@
+// app/lists.tsx
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -29,19 +30,31 @@ export default function ListsRoute() {
 
     const { lists, createList, deleteList, updateList } = useLists(boardId);
 
-    const [name, setName] = useState("");
-    const [color, setColor] = useState("#ffffff");
+    // create modal state
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [createName, setCreateName] = useState("");
+    const [createColor, setCreateColor] = useState("#ffffff");
 
+    // edit modal state
     const [editing, setEditing] = useState<{ id: number; name: string; color: string } | null>(null);
 
-    function handleCreate() {
-        if (!name.trim()) {
+    function openCreateModal() {
+        setCreateName("");
+        setCreateColor("#ffffff");
+        setCreateModalOpen(true);
+    }
+    function closeCreateModal() {
+        setCreateModalOpen(false);
+    }
+
+    function handleCreateSave() {
+        if (!createName.trim()) {
         Alert.alert("Validation", "Please enter a list name.");
         return;
         }
         try {
-        createList({ name: name.trim(), color });
-        setName("");
+        createList({ name: createName.trim(), color: createColor });
+        closeCreateModal();
         } catch (e: any) {
         Alert.alert("Error", e.message ?? "Failed to create list");
         }
@@ -85,15 +98,8 @@ export default function ListsRoute() {
 
     return (
         <View style={styles.container}>
-        <Text style={styles.title}>Create a new List </Text>
+        <Text style={styles.title}>Lists for this board</Text>
 
-        <View style={styles.inputRow}>
-            <TextInput placeholder="List name" value={name} onChangeText={setName} style={styles.nameInput} />
-            <TextInput placeholder="#color" value={color} onChangeText={setColor} style={styles.colorInput} />
-            <Button title="Add" onPress={handleCreate} />
-        </View>
-
-        <Text style={styles.title}>Lists for this board </Text>
 
         <FlatList
             data={lists}
@@ -109,6 +115,41 @@ export default function ListsRoute() {
             ListEmptyComponent={<Text style={styles.empty}>No lists yet.</Text>}
             contentContainerStyle={{ padding: SPACING.md }}
         />
+        {/* Add List button */}
+        <View style={{ paddingHorizontal: SPACING.md, marginBottom: SPACING.sm }}>
+            <Button title="Create List" onPress={openCreateModal} />
+        </View>
+
+        {/* Create Modal */}
+        <Modal visible={createModalOpen} animationType="slide" transparent>
+            <View style={modalStyles.overlay}>
+            <View style={modalStyles.sheet}>
+                <Text style={modalStyles.heading}>Create list</Text>
+
+                <TextInput
+                placeholder="List name"
+                value={createName}
+                onChangeText={setCreateName}
+                style={modalStyles.input}
+                />
+                <TextInput
+                placeholder="#color"
+                value={createColor}
+                onChangeText={setCreateColor}
+                style={modalStyles.input}
+                />
+
+                <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: SPACING.md }}>
+                <Pressable onPress={closeCreateModal} style={modalStyles.button}>
+                    <Text>Cancel</Text>
+                </Pressable>
+                <Pressable onPress={handleCreateSave} style={[modalStyles.button, { marginLeft: SPACING.sm }]}>
+                    <Text style={{ fontWeight: "600" }}>Create</Text>
+                </Pressable>
+                </View>
+            </View>
+            </View>
+        </Modal>
 
         {/* Edit Modal */}
         <Modal visible={!!editing} animationType="slide" transparent>
@@ -153,30 +194,6 @@ const styles = StyleSheet.create({
         marginTop: SPACING.md,
         marginLeft: SPACING.md,
         marginBottom: SPACING.sm,
-    },
-    inputRow: {
-        flexDirection: "row",
-        paddingHorizontal: SPACING.md,
-        marginBottom: SPACING.sm,
-        alignItems: "center",
-    },
-    nameInput: {
-        flex: 1,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        padding: SPACING.sm,
-        marginRight: SPACING.sm,
-        borderRadius: 6,
-        backgroundColor: COLORS.white,
-    },
-    colorInput: {
-        width: 100,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        padding: SPACING.sm,
-        marginRight: SPACING.sm,
-        borderRadius: 6,
-        backgroundColor: COLORS.white,
     },
     empty: {
         textAlign: "center",
