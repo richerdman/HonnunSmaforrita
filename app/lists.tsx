@@ -1,4 +1,3 @@
-// app/lists.tsx
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -30,12 +29,10 @@ export default function ListsRoute() {
 
     const { lists, createList, deleteList, updateList } = useLists(boardId);
 
-    // create modal state
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [createName, setCreateName] = useState("");
     const [createColor, setCreateColor] = useState("#ffffff");
 
-    // edit modal state
     const [editing, setEditing] = useState<{ id: number; name: string; color: string } | null>(null);
 
     function openCreateModal() {
