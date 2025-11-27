@@ -71,5 +71,14 @@ export function useLists(boardId: number) {
         return removed;
     }, []);
 
-    return { lists, createList, deleteList, reload };
+    const updateList = useCallback((id: number, patch: Partial<Pick<List, "name" | "color">>) => {
+        ensureInit();
+        const idx = listsStore!.findIndex((l) => l.id === id);
+        if (idx === -1) return null;
+        listsStore![idx] = { ...listsStore![idx], ...patch };
+        notifyAll();
+        return listsStore![idx];
+    }, []);
+
+    return { lists, createList, deleteList, updateList, reload };
 }
