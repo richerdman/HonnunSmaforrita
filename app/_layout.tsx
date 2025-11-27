@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { COLORS } from "../constants/theme";
+import { COLORS } from "../src/constants/theme";
 
 // defines what header bar looks like, which screens exist, their titles and the navigation structure
 export default function Layout() {

@@ -1,19 +1,19 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-	Alert,
-	FlatList,
-	Platform,
-	StyleSheet,
-	Text,
-	TextInput,
-	View,
+    Alert,
+    FlatList,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
 
-import Button from "../components/button";
-import ListCard from "../components/ListCard";
-import { COLORS, FONT_SIZES, SPACING } from "../constants/theme";
-import { useLists } from "../hooks/useLists";
+import Button from "../src/components/button";
+import ListCard from "../src/components/ListCard";
+import { COLORS, FONT_SIZES, SPACING } from "../src/constants/theme";
+import { useLists } from "../src/hooks/useLists";
 
 type Params = {
     boardId?: string;

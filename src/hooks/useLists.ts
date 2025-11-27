@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import rawData from "../data/data.json";
-import { List } from "../types";
+import { List } from "../types/types";
 
 let listsStore: List[] | null = null;
 const listeners: Array<() => void> = [];
