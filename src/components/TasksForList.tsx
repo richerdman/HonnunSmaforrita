@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
+    Alert,
     FlatList,
     Modal,
     Text,
@@ -7,35 +8,88 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import TaskCard from "../components/taskCard/TaskCard";
 import { SPACING } from "../constants/theme";
+import { useLists } from "../hooks/useLists";
 import { useTasks } from "../hooks/useTasks";
 import type { Task } from "../services/taskService";
-import { getListById, getLists } from "../services/taskService";
+import { getListById } from "../services/taskService";
 import styles from "../views/tasks/styles";
 import Button from "./button";
-import TaskCard from "./taskCard/TaskCard";
 
 type Props = { listId: number; showHeader?: boolean };
 
 export default function TasksForList({ listId, showHeader = true }: Props) {
+    const list = getListById(listId);
+    const boardId = list ? list.boardId : 0;
+    const { lists } = useLists(boardId);
     const { tasks, createTask, edit, toggle, move, remove } = useTasks(listId);
     const [openForm, setOpenForm] = useState(false);
     const [newName, setNewName] = useState("");
     const [newDescription, setNewDescription] = useState("");
+    const [newDueDate, setNewDueDate] = useState("");
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [datePickerDate, setDatePickerDate] = useState<Date>(new Date());
+    const [errorMsg, setErrorMsg] = useState("");
     const [moveTaskId, setMoveTaskId] = useState<number | null>(null);
     const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
-    const list = getListById(listId);
 
     function onSubmitForm() {
-        if (!newName.trim()) return;
+        // validate due date if provided: must be ISO YYYY-MM-DD
+        const due = newDueDate?.trim();
+        if (due) {
+            const isIso = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(due);
+            let valid = false;
+            if (isIso) {
+                const d = new Date(due);
+                valid = !isNaN(d.getTime()) && d.toISOString().startsWith(due);
+            }
+            if (!valid) {
+                const msg = 'Please enter the due date in YYYY-MM-DD format.';
+                setErrorMsg(msg);
+                Alert.alert('Invalid date', msg);
+                return;
+            }
+            // check for past date (compare date-only values)
+            const parsed = new Date(due);
+            const parsedDateOnly = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+            const today = new Date();
+            const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            if (parsedDateOnly < todayDateOnly) {
+                const msg = 'Due date cannot be in the past.';
+                setErrorMsg(msg);
+                Alert.alert('Past date', msg);
+                return;
+            }
+        }
+        if (!newName.trim()) {
+            const msg = 'Please enter a task name.';
+            setErrorMsg(msg);
+            Alert.alert('Missing name', msg);
+            return;
+        }
         if (editingTaskId !== null) {
-            edit(editingTaskId, { name: newName.trim(), description: newDescription.trim() });
+            const res = edit(editingTaskId, { name: newName.trim(), description: newDescription.trim(), dueDate: newDueDate || undefined });
+            if (!(res && (res as any).ok)) {
+                const msg = (res && (res as any).error) || 'Failed to save task';
+                setErrorMsg(msg);
+                Alert.alert('Error', msg);
+                return;
+            }
         } else {
-            createTask({ name: newName.trim(), description: newDescription.trim() });
+            const res = createTask({ name: newName.trim(), description: newDescription.trim(), dueDate: newDueDate || undefined });
+            if (!(res && (res as any).ok)) {
+                const msg = (res && (res as any).error) || 'Failed to create task';
+                setErrorMsg(msg);
+                Alert.alert('Error', msg);
+                return;
+            }
         }
         setNewName("");
         setNewDescription("");
+        setNewDueDate("");
+        setErrorMsg("");
         setEditingTaskId(null);
         setOpenForm(false);
     }
@@ -43,6 +97,7 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
     function onEdit(task: Task) {
         setNewName(task.name);
         setNewDescription(task.description ?? "");
+        setNewDueDate(task.dueDate ?? "");
         setEditingTaskId(task.id);
         setOpenForm(true);
     }
@@ -112,6 +167,29 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
                             style={[styles.input, styles.textarea]}
                             multiline
                         />
+                        <View>
+                            <TextInput
+                                placeholder="Due Date (YYYY-MM-DD)"
+                                value={newDueDate}
+                                onChangeText={(t) => {
+                                    setNewDueDate(t);
+                                    if (errorMsg) setErrorMsg("");
+                                }}
+                                style={styles.input}
+                            />
+                            {errorMsg ? (
+                                <Text style={styles.error}>{errorMsg}</Text>
+                            ) : null}
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setDatePickerDate(newDueDate ? new Date(newDueDate) : new Date());
+                                    setShowDatePicker(true);
+                                }}
+                                style={styles.datePickerButton}
+                            >
+                
+                            </TouchableOpacity>
+                        </View>
                         <View
                             style={{
                                 flexDirection: "row",
@@ -151,7 +229,7 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
                     <Text style={{ fontWeight: "700", marginBottom: 6 }}>
                         Move task to...
                     </Text>
-                    {getLists()
+                    {lists
                         .filter((l) => l.id !== listId)
                         .map((l) => (
                             <TouchableOpacity

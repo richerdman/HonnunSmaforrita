@@ -4,8 +4,9 @@ import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, Vi
 import Button from "../../src/components/button";
 import TaskCard from "../../src/components/taskCard/TaskCard";
 import { SPACING } from "../../src/constants/theme";
+import { getListByIdFromStore, useAllLists } from "../../src/hooks/useLists";
 import { useTasks } from "../../src/hooks/useTasks";
-import { getListById, getLists } from "../../src/services/taskService";
+import { getListById as getListByIdFromService } from "../../src/services/taskService";
 import styles from "../../src/views/tasks/styles";
 
 export default function TasksForList() {
@@ -15,6 +16,8 @@ export default function TasksForList() {
     const [moveTaskId, setMoveTaskId] = useState<number | null>(null);
     const [newName, setNewName] = useState("");
     const [newDescription, setNewDescription] = useState("");
+    const [newDueDate, setNewDueDate] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
     const { tasks, createTask, edit, toggle, move, remove } = useTasks(listId);
@@ -23,21 +26,41 @@ export default function TasksForList() {
         toggle(id);
     }
 
-    function onCreate() {
-        if (!newName.trim()) return;
-        createTask({ name: newName.trim(), description: newDescription.trim() });
-        setNewName("");
-        setNewDescription("");
-        setShowCreateModal(false);
-        setEditingTaskId(null);
-    }
-
     function onSubmit() {
+        // validate due date (optional) - must be YYYY-MM-DD if provided
+        const due = newDueDate?.trim();
+        if (due) {
+            const isIso = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(due);
+            let valid = false;
+            if (isIso) {
+                const d = new Date(due);
+                valid = !isNaN(d.getTime()) && d.toISOString().startsWith(due);
+            }
+            if (!valid) {
+                const msg = 'Please enter the due date in YYYY-MM-DD format.';
+                setErrorMsg(msg);
+                Alert.alert('Invalid date', msg);
+                return;
+            }
+        }
         if (!newName.trim()) return;
+        setErrorMsg("");
         if (editingTaskId !== null) {
-            edit(editingTaskId, { name: newName.trim(), description: newDescription.trim() });
+            const res = edit(editingTaskId, { name: newName.trim(), description: newDescription.trim(), dueDate: newDueDate || undefined });
+            if (!(res && (res as any).ok)) {
+                const msg = (res && (res as any).error) || 'Failed to save task';
+                setErrorMsg(msg);
+                Alert.alert('Error', msg);
+                return;
+            }
         } else {
-            createTask({ name: newName.trim(), description: newDescription.trim() });
+            const res = createTask({ name: newName.trim(), description: newDescription.trim(), dueDate: newDueDate || undefined });
+            if (!(res && (res as any).ok)) {
+                const msg = (res && (res as any).error) || 'Failed to create task';
+                setErrorMsg(msg);
+                Alert.alert('Error', msg);
+                return;
+            }
         }
         setNewName("");
         setNewDescription("");
@@ -72,7 +95,9 @@ export default function TasksForList() {
         );
     }
 
-    const list = getListById(listId);
+    // prefer hook-backed list lookup so newly created lists are visible
+    const list = getListByIdFromStore(listId) ?? getListByIdFromService(listId);
+    const { lists: allLists } = useAllLists();
 
     return (
         <View style={styles.container}>
@@ -92,6 +117,7 @@ export default function TasksForList() {
                             setEditingTaskId(item.id);
                             setNewName(item.name);
                             setNewDescription(item.description ?? "");
+                            setNewDueDate(item.dueDate ?? "");
                             setShowCreateModal(true);
                         }}
                         onDelete={() => onDelete(item.id)}
@@ -107,7 +133,7 @@ export default function TasksForList() {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalHeader}>Move task to...</Text>
-                        {getLists()
+                        {allLists
                             .filter((l) => l.id !== listId)
                             .map((l) => (
                                 <TouchableOpacity
@@ -138,6 +164,7 @@ export default function TasksForList() {
                     setEditingTaskId(null);
                     setNewName("");
                     setNewDescription("");
+                    setNewDueDate("");
                     setShowCreateModal(true);
                 }}
                 style={{
@@ -156,10 +183,12 @@ export default function TasksForList() {
                     <View style={styles.modalContent}>
                         <Text style={styles.formTitle}>{editingTaskId !== null ? 'Edit Task' : 'Create Task'}</Text>
                         <TextInput placeholder="Name" value={newName} onChangeText={setNewName} style={styles.input} />
-                        <TextInput placeholder="Description" value={newDescription} onChangeText={setNewDescription} style={[styles.input, styles.textarea]} multiline />
+                            <TextInput placeholder="Description" value={newDescription} onChangeText={setNewDescription} style={[styles.input, styles.textarea]} multiline />
+                            <TextInput placeholder="Due date (YYYY-MM-DD) - (Optional)" value={newDueDate} onChangeText={(t) => { setNewDueDate(t); if (errorMsg) setErrorMsg(""); }} style={styles.input} />
+                            {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
                         <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
                             <Button title={editingTaskId !== null ? 'Save' : 'Create'} onPress={onSubmit} style={{ paddingHorizontal: SPACING.lg }} />
-                            <Button title="Cancel" onPress={() => { setNewName(''); setNewDescription(''); setShowCreateModal(false); }} style={{ backgroundColor: '#ccc' }} />
+                            <Button title="Cancel" onPress={() => { setNewName(''); setNewDescription(''); setNewDueDate(''); setShowCreateModal(false); }} style={{ backgroundColor: '#ccc' }} />
                         </View>
                     </View>
                 </View>

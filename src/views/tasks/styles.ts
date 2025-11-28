@@ -60,6 +60,18 @@ export default StyleSheet.create({
         marginBottom: SPACING.sm,
         backgroundColor: COLORS.white,
     },
+    datePickerButton: {
+        paddingVertical: SPACING.sm,
+        paddingHorizontal: SPACING.md,
+        borderRadius: 6,
+        backgroundColor: '#f2f2f2',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: SPACING.xs ?? 4,
+    },
+    datePickerText: {
+        color: COLORS.textPrimary,
+    },
     textarea: { minHeight: 60, textAlignVertical: "top" },
     formLabel: { marginBottom: SPACING.sm, color: COLORS.textPrimary },
     listChip: {
@@ -111,5 +123,9 @@ export default StyleSheet.create({
         marginRight: SPACING.md,
         borderWidth: 1,
         borderColor: COLORS.border,
+    },
+    error: {
+        color: '#ff3b30',
+        marginTop: SPACING.xs,
     },
 });

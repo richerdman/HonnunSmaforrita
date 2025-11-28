@@ -82,3 +82,32 @@ export function useLists(boardId: number) {
 
     return { lists, createList, deleteList, updateList, reload };
 }
+
+export function getListByIdFromStore(id: number) {
+    ensureInit();
+    return listsStore!.find((l) => l.id === id) ?? null;
+}
+
+export function useAllLists() {
+    ensureInit();
+
+    const [allLists, setAllLists] = useState<List[]>(() => listsStore!.slice());
+
+    useEffect(() => {
+        function onChange() {
+            setAllLists(listsStore!.slice());
+        }
+        listeners.push(onChange);
+        onChange();
+        return () => {
+            const idx = listeners.indexOf(onChange);
+            if (idx !== -1) listeners.splice(idx, 1);
+        };
+    }, []);
+
+    const reload = useCallback(() => {
+        setAllLists(listsStore!.slice());
+    }, []);
+
+    return { lists: allLists, reload };
+}
