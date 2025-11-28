@@ -22,9 +22,12 @@ export function useTasks(listId: number) {
 	}, [listId]);
 
 	const createTask = useCallback(
-		(payload: { name: string; description?: string }) => {
-			svcCreateTask({ ...payload, listId });
-			refresh();
+		(payload: { name: string; description?: string; dueDate?: string }) => {
+			const res = svcCreateTask({ ...payload, listId });
+			if (res && (res as any).ok) {
+				refresh();
+			}
+			return res;
 		},
 		[listId, refresh]
 	);
@@ -45,8 +48,11 @@ export function useTasks(listId: number) {
 	}, [refresh]);
 
 	const edit = useCallback((id: number, updates: Partial<Omit<Task, 'id' | 'listId'>>) => {
-		svcEditTask(id, updates);
-		refresh();
+		const res = svcEditTask(id, updates);
+		if (res && (res as any).ok) {
+			refresh();
+		}
+		return res;
 	}, [refresh]);
 
 	return { tasks, refresh, createTask, toggle, move, remove, edit } as const;
