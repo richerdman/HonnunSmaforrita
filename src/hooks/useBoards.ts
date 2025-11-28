@@ -1,15 +1,34 @@
 import { useState } from "react";
-import boardsData from "../data/data.json";
+import { createBoard, deleteBoard, getAllBoards, getBoardById, updateBoard } from "../services/boardServices";
 import { Board } from "../types/types";
 
 export function useBoards() {
-    const [boards, setBoards] = useState<Board[]>(boardsData.boards as Board[]);
+    const [boards, setBoards] = useState<Board[]>(getAllBoards());
     const addBoard = (board: Omit<Board, "id">) => {
-        const newBoard: Board = {
-            ...board,
-            id: Math.max(...boards.map(b => b.id),0) + 1, // id generation 
-        };
+        const newBoard = createBoard({
+            name: board.name,
+            description: board.description,
+            thumbnailPhoto: board.thumbnailPhoto,
+        })
         setBoards([...boards, newBoard]);
-        }
-    return { boards, addBoard };
+        return newBoard;
+    };
+
+    const removeBoard = (id: number) => {
+        deleteBoard(id);
+        console.log("Removing board with id:", id);
+        setBoards([...getAllBoards()]);
+        console.log("Updated boards:", getAllBoards());
+    };
+
+    const editBoard = (id: number, updates: Partial<Omit<Board, "id">>) => {
+        updateBoard(id, updates);
+        setBoards([...getAllBoards()]);
+    }
+
+    const getBoard = (id: number) => {
+        return getBoardById(id);
+    };
+
+    return { boards, addBoard, removeBoard, getBoard, editBoard };
 }

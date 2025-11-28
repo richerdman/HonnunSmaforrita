@@ -23,6 +23,7 @@ export default function Layout() {
             />
 			<Stack.Screen name="lists" options={{ title: "Lists" }} />
 			<Stack.Screen name="tasks/[listId]" options={{ title: "Tasks" }} />
+            <Stack.Screen name="editBoard" options={{ title: "Edit Board" }} />
         </Stack>
     );
 }

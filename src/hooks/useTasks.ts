@@ -45,8 +45,10 @@ export function useTasks(listId: number) {
 	}, [refresh]);
 
 	const edit = useCallback((id: number, updates: Partial<Omit<Task, 'id' | 'listId'>>) => {
-		svcEditTask(id, updates);
-		refresh();
+		const res = svcEditTask(id, updates);
+		if (res && (res as any).ok){
+			refresh();
+		}
 	}, [refresh]);
 
 	return { tasks, refresh, createTask, toggle, move, remove, edit } as const;

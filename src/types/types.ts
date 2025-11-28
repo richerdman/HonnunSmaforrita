@@ -3,17 +3,28 @@ export type Board = {
     name: string;
     description: string;
     thumbnailPhoto: string;
-}
+};
 
-export interface List {
+export type List = {
     id: number;
+    boardId: number;
     name: string;
     color: string;
-    boardId: number;
-}
+};
+
+export type Task = {
+    id: number;
+    listId: number;
+    name: string;
+    description: string;
+    isFinished: boolean;
+};
 
 export type RootStackParamList = {
     Home: undefined;
     Boards: undefined;
-
+    createBoard: undefined;
+    editBoard: { boardId: number };
+    Lists: { boardId: number };
+    Tasks: { listId: number };
 };
