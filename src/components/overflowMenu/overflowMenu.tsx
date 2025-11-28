@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import styles from "./styles";
 
-type MenuItem = { label: string; onPress: () => void; destructive?: boolean };
+type MenuItem = { label: string; onPress?: () => void; destructive?: boolean; isHeader?: boolean };
 
 type Props = {
     onMove?: () => void;
@@ -76,21 +76,27 @@ export default function OverflowMenu({ onMove, onEdit, onDelete, items, buttonSt
                                 <View style={styles.menuInner}>
                                     {items && items.length > 0 ? (
                                         items.map((it: MenuItem, idx: number) => (
-                                            <TouchableOpacity
-                                                key={idx}
-                                                onPress={() => {
-                                                    closeMenu();
-                                                    it.onPress();
-                                                }}
-                                                style={[
-                                                    styles.menuItem,
-                                                    it.destructive ? styles.menuDeleteItem : undefined,
-                                                ]}
-                                            >
-                                                <Text style={[styles.menuText, it.destructive ? styles.deleteTxt : undefined]}>
-                                                    {it.label}
-                                                </Text>
-                                            </TouchableOpacity>
+                                            it.isHeader ? (
+                                                <View key={idx} style={styles.menuHeader}>
+                                                    <Text style={styles.menuHeaderText}>{it.label}</Text>
+                                                </View>
+                                            ) : (
+                                                <TouchableOpacity
+                                                    key={idx}
+                                                    onPress={() => {
+                                                        closeMenu();
+                                                        it.onPress && it.onPress();
+                                                    }}
+                                                    style={[
+                                                        styles.menuItem,
+                                                        it.destructive ? styles.menuDeleteItem : undefined,
+                                                    ]}
+                                                >
+                                                    <Text style={[styles.menuText, it.destructive ? styles.deleteTxt : undefined]}>
+                                                        {it.label}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            )
                                         ))
                                     ) : (
                                         <>

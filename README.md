@@ -26,5 +26,8 @@ In the output, you'll find options to open the app in a
 Our group implemented several features that go beyond the assignment description:
 - Edit Boards - Users can modify the name, description of an existing board.
 - Edit Lists - Users can update a list’s name and color after creating it.
-- Edit Tasks - Users can edit the task name, description.
+- Edit Tasks - Users can edit the task name, description, due date.
+- Due dates for tasks - Users can add an optional due date for tasks, the date can not be in the past.
+- Show/Hide completed tasks - User can choose to hide or see tasks that have already been completed.
+- Task sorting - The tasks can be sorted in alphabetical order or by their due date.
 

@@ -1,12 +1,15 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
-import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Platform, Text, View } from "react-native";
 import Button from "../../src/components/button";
-import OverflowMenu from "../../src/components/overflowMenu/overflowMenu";
+import MoveTaskModal from "../../src/components/MoveTaskModal";
 import TaskCard from "../../src/components/taskCard/TaskCard";
+import TaskFormModal from "../../src/components/TaskFormModal";
+import TaskHeader from "../../src/components/TaskHeader";
 import { SPACING } from "../../src/constants/theme";
 import { getListByIdFromStore, useAllLists } from "../../src/hooks/useLists";
 import { useTasks } from "../../src/hooks/useTasks";
+import useVisibleTasks from "../../src/hooks/useVisibleTasks";
 import { getListById as getListByIdFromService } from "../../src/services/taskService";
 import styles from "../../src/views/tasks/styles";
 
@@ -15,59 +18,19 @@ export default function TasksForList() {
     const listId = Number(params.listId ?? NaN);
 
     const [moveTaskId, setMoveTaskId] = useState<number | null>(null);
-    const [newName, setNewName] = useState("");
-    const [newDescription, setNewDescription] = useState("");
-    const [newDueDate, setNewDueDate] = useState("");
+    
     const [errorMsg, setErrorMsg] = useState("");
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
     const [showCompleted, setShowCompleted] = useState(true);
+    const [sortMode, setSortMode] = useState<'none' | 'due' | 'name'>('none');
     const { tasks, createTask, edit, toggle, move, remove } = useTasks(listId);
 
     function onToggle(id: number) {
         toggle(id);
     }
 
-    function onSubmit() {
-        const due = newDueDate?.trim();
-        if (due) {
-            const isIso = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(due);
-            let valid = false;
-            if (isIso) {
-                const d = new Date(due);
-                valid = !isNaN(d.getTime()) && d.toISOString().startsWith(due);
-            }
-            if (!valid) {
-                const msg = 'Please enter the due date in YYYY-MM-DD format.';
-                setErrorMsg(msg);
-                Alert.alert('Invalid date', msg);
-                return;
-            }
-        }
-        if (!newName.trim()) return;
-        setErrorMsg("");
-        if (editingTaskId !== null) {
-            const res = edit(editingTaskId, { name: newName.trim(), description: newDescription.trim(), dueDate: newDueDate || undefined });
-            if (!(res && (res as any).ok)) {
-                const msg = (res && (res as any).error) || 'Failed to save task';
-                setErrorMsg(msg);
-                Alert.alert('Error', msg);
-                return;
-            }
-        } else {
-            const res = createTask({ name: newName.trim(), description: newDescription.trim(), dueDate: newDueDate || undefined });
-            if (!(res && (res as any).ok)) {
-                const msg = (res && (res as any).error) || 'Failed to create task';
-                setErrorMsg(msg);
-                Alert.alert('Error', msg);
-                return;
-            }
-        }
-        setNewName("");
-        setNewDescription("");
-        setShowCreateModal(false);
-        setEditingTaskId(null);
-    }
+    // Task creation/editing is handled by TaskFormModal
 
     function onDelete(id: number) {
         if (Platform.OS === "web") {
@@ -100,24 +63,23 @@ export default function TasksForList() {
     const list = getListByIdFromStore(listId) ?? getListByIdFromService(listId);
     const { lists: allLists } = useAllLists();
 
+    // prepare filtered + sorted tasks for display based on header menu choices
+    const displayed = useVisibleTasks(tasks, showCompleted, sortMode);
+
     return (
         <View style={styles.container}>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={styles.title}>{list?.name ?? `List ${listId}`}</Text>
-                <OverflowMenu
-                    items={[
-                        {
-                            label: showCompleted ? 'Hide completed' : 'Show completed',
-                            onPress: () => setShowCompleted((s) => !s),
-                        },
-                    ]}
-                    buttonStyle={{ marginRight: SPACING.md, marginTop: SPACING.xs }}
-                />
-            </View>
+            <TaskHeader
+                title={list?.name ?? `List ${listId}`}
+                showCompleted={showCompleted}
+                onToggleShowCompleted={() => setShowCompleted((s) => !s)}
+                sortMode={sortMode}
+                setSortMode={(m) => setSortMode(m)}
+                buttonStyle={{ marginRight: SPACING.md, marginTop: SPACING.xs }}
+            />
 
             <FlatList
-                data={tasks.filter((t) => showCompleted || !t.isFinished)}
+                data={displayed}
                 keyExtractor={(t) => String(t.id)}
                 renderItem={({ item }) => (
                     <TaskCard
@@ -127,9 +89,6 @@ export default function TasksForList() {
                         onMove={() => setMoveTaskId(item.id)}
                         onEdit={() => {
                             setEditingTaskId(item.id);
-                            setNewName(item.name);
-                            setNewDescription(item.description ?? "");
-                            setNewDueDate(item.dueDate ?? "");
                             setShowCreateModal(true);
                         }}
                         onDelete={() => onDelete(item.id)}
@@ -141,42 +100,23 @@ export default function TasksForList() {
                 contentContainerStyle={{ padding: SPACING.md }}
             />
 
-            <Modal visible={!!moveTaskId} transparent animationType="fade" onRequestClose={() => setMoveTaskId(null)}>
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalHeader}>Move task to...</Text>
-                        {allLists
-                            .filter((l) => l.id !== listId)
-                            .map((l) => (
-                                <TouchableOpacity
-                                    key={l.id}
-                                    onPress={() => {
-                                        if (!moveTaskId) return;
-                                        move(moveTaskId, l.id);
-                                        setMoveTaskId(null);
-                                    }}
-                                    style={styles.modalListItem}
-                                >
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <View style={[styles.modalListColor, { backgroundColor: l.color ?? '#fff' }]} />
-                                        <Text style={styles.modalListItemText}>{l.name}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
-                        <View style={{ marginTop: SPACING.sm, flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <Button title="Cancel" onPress={() => setMoveTaskId(null)} style={{ backgroundColor: '#ccc' }} />
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+            <MoveTaskModal
+                visible={!!moveTaskId}
+                moveTaskId={moveTaskId}
+                currentListId={listId}
+                allLists={allLists}
+                onMove={(toListId) => {
+                    if (!moveTaskId) return;
+                    move(moveTaskId, toListId);
+                    setMoveTaskId(null);
+                }}
+                onClose={() => setMoveTaskId(null)}
+            />
 
             <Button
                 title="Create Task"
                 onPress={() => {
                     setEditingTaskId(null);
-                    setNewName("");
-                    setNewDescription("");
-                    setNewDueDate("");
                     setShowCreateModal(true);
                 }}
                 style={{
@@ -190,21 +130,21 @@ export default function TasksForList() {
                 }}
             />
 
-            <Modal visible={showCreateModal} transparent animationType="fade" onRequestClose={() => setShowCreateModal(false)}>
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.formTitle}>{editingTaskId !== null ? 'Edit Task' : 'Create Task'}</Text>
-                        <TextInput placeholder="Name" value={newName} onChangeText={setNewName} style={styles.input} />
-                            <TextInput placeholder="Description" value={newDescription} onChangeText={setNewDescription} style={[styles.input, styles.textarea]} multiline />
-                            <TextInput placeholder="Due date (YYYY-MM-DD) - (Optional)" value={newDueDate} onChangeText={(t) => { setNewDueDate(t); if (errorMsg) setErrorMsg(""); }} style={styles.input} />
-                            {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
-                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                            <Button title={editingTaskId !== null ? 'Save' : 'Create'} onPress={onSubmit} style={{ paddingHorizontal: SPACING.lg }} />
-                            <Button title="Cancel" onPress={() => { setNewName(''); setNewDescription(''); setNewDueDate(''); setShowCreateModal(false); }} style={{ backgroundColor: '#ccc' }} />
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+            <TaskFormModal
+                visible={showCreateModal}
+                title={editingTaskId !== null ? 'Edit Task' : 'Create Task'}
+                task={editingTaskId !== null ? tasks.find((t) => t.id === editingTaskId) : undefined}
+                onClose={() => {
+                    setShowCreateModal(false);
+                    setEditingTaskId(null);
+                }}
+                onSubmit={(payload) => {
+                    if (editingTaskId !== null) {
+                        return edit(editingTaskId, { name: payload.name, description: payload.description, dueDate: payload.dueDate });
+                    }
+                    return createTask({ name: payload.name, description: payload.description, dueDate: payload.dueDate });
+                }}
+            />
         </View>
     );
 }

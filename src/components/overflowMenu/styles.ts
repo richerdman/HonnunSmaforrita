@@ -36,6 +36,15 @@ export default StyleSheet.create({
     paddingVertical: 6,
     minWidth: 200,
   },
+  menuHeader: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: 'transparent',
+  },
+  menuHeaderText: {
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+  },
   menuItem: {
     paddingVertical: 12,
     paddingHorizontal: 14,
