@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import React from "react";
-import { FlatList, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, ListRenderItem, Platform, StyleSheet, Text, View } from "react-native";
 import BoardCard from "../src/components/BoardCard";
+import Button from "../src/components/button";
 import { COLORS, FONT_SIZES, SPACING } from "../src/constants/theme";
 import { useBoards } from "../src/hooks/useBoards";
 import { Board } from "../src/types/types";
@@ -12,6 +13,18 @@ export default function BoardsScreen() {
     const router = useRouter();
     const { boards, removeBoard } = useBoards();
 
+    function handleDeleteWithConfirm(id: number) {
+        if (Platform.OS === 'web') {
+            if (window.confirm('Delete board\n\nAre you sure?')) removeBoard(id);
+            return;
+        }
+
+        Alert.alert('Delete board', 'Are you sure you want to delete this board?', [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Delete', style: 'destructive', onPress: () => removeBoard(id) },
+        ]);
+    }
+
     const renderBoard: ListRenderItem<Board> = ({ item }) => (
         <BoardCard
         board={item}
@@ -19,8 +32,7 @@ export default function BoardsScreen() {
             router.push(`/lists?boardId=${item.id}`);
         }}
         onDelete={(id)=>{
-            console.log("Deleting board with id:", id);
-            removeBoard(id);
+            handleDeleteWithConfirm(id);
         }}
         onEdit={(id) => {
             router.push(`/editBoard?boardId=${id}`);
@@ -40,12 +52,20 @@ export default function BoardsScreen() {
             }
         />
 
-        <TouchableOpacity
-            style={styles.addButton}
+        <Button
+            title="Create Board"
             onPress={() => router.push("/createBoard")}
-            >
-                <Text style={styles.addButtonText}>Create Board</Text>
-            </TouchableOpacity>
+            style={{
+                marginTop: SPACING.md,
+                paddingHorizontal: SPACING.lg,
+                paddingVertical: SPACING.md,
+                minHeight: 48,
+                marginBottom: SPACING.md,
+                marginHorizontal: SPACING.md,
+                alignSelf: 'stretch',
+                borderRadius: 5,
+            }}
+        />
         </View>
     );
 }

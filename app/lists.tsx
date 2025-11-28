@@ -114,11 +114,23 @@ export default function ListsRoute() {
         />
         {/* Add List button */}
         <View style={{ paddingHorizontal: SPACING.md, marginBottom: SPACING.sm }}>
-            <Button title="Create List" onPress={openCreateModal} />
+            <Button
+                title="Create List"
+                onPress={openCreateModal}
+                style={{
+                    marginTop: SPACING.sm,
+                    paddingHorizontal: SPACING.lg,
+                    paddingVertical: SPACING.md,
+                    minHeight: 48,
+                    marginBottom: SPACING.md,
+                    marginHorizontal: SPACING.md,
+                    alignSelf: 'stretch',
+                }}
+            />
         </View>
 
         {/* Create Modal */}
-        <Modal visible={createModalOpen} animationType="slide" transparent>
+        <Modal visible={createModalOpen} animationType="fade" transparent>
             <View style={modalStyles.overlay}>
             <View style={modalStyles.sheet}>
                 <Text style={modalStyles.heading}>Create list</Text>
