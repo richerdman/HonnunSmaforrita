@@ -1,62 +1,54 @@
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Button from "../../src/components/button";
-import TaskCard from "../../src/components/TaskCard";
+import TaskCard from "../../src/components/taskCard/TaskCard";
 import { SPACING } from "../../src/constants/theme";
-import {
-    createTask,
-    deleteTask,
-    getListById,
-    getLists,
-    getTasksByList,
-    moveTask,
-    Task,
-    toggleTaskFinished,
-} from "../../src/services/taskService";
+import { useTasks } from "../../src/hooks/useTasks";
+import { getListById, getLists } from "../../src/services/taskService";
 import styles from "../../src/views/tasks/styles";
 
 export default function TasksForList() {
     const params = useLocalSearchParams<{ listId?: string }>();
     const listId = Number(params.listId ?? NaN);
 
-    const [tasks, setTasks] = useState<Task[]>([]);
     const [moveTaskId, setMoveTaskId] = useState<number | null>(null);
     const [newName, setNewName] = useState("");
     const [newDescription, setNewDescription] = useState("");
     const [showCreateModal, setShowCreateModal] = useState(false);
-
-    useEffect(() => {
-        if (!Number.isNaN(listId)) setTasks(getTasksByList(listId));
-    }, [listId]);
-
-    function refresh() {
-        setTasks(getTasksByList(listId));
-    }
+    const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+    const { tasks, createTask, edit, toggle, move, remove } = useTasks(listId);
 
     function onToggle(id: number) {
-        toggleTaskFinished(id);
-        refresh();
+        toggle(id);
     }
 
     function onCreate() {
         if (!newName.trim()) return;
-        createTask({
-            name: newName.trim(),
-            description: newDescription.trim(),
-            listId,
-        });
+        createTask({ name: newName.trim(), description: newDescription.trim() });
         setNewName("");
         setNewDescription("");
         setShowCreateModal(false);
-        refresh();
+        setEditingTaskId(null);
+    }
+
+    function onSubmit() {
+        if (!newName.trim()) return;
+        if (editingTaskId !== null) {
+            edit(editingTaskId, { name: newName.trim(), description: newDescription.trim() });
+        } else {
+            createTask({ name: newName.trim(), description: newDescription.trim() });
+        }
+        setNewName("");
+        setNewDescription("");
+        setShowCreateModal(false);
+        setEditingTaskId(null);
     }
 
     function onDelete(id: number) {
         if (Platform.OS === "web") {
             if (window.confirm("Delete task\n\nAre you sure?")) {
-                deleteTask(id);
-                refresh();
+                remove(id);
             }
             return;
         }
@@ -66,13 +58,11 @@ export default function TasksForList() {
             {
                 text: "Delete",
                 style: "destructive",
-                onPress: () => {
-                    deleteTask(id);
-                    refresh();
-                },
+                onPress: () => remove(id),
             },
         ]);
     }
+	
 
     if (Number.isNaN(listId)) {
         return (
@@ -98,6 +88,12 @@ export default function TasksForList() {
                         listColor={list?.color}
                         onToggle={(id: number) => onToggle(id)}
                         onMove={() => setMoveTaskId(item.id)}
+                        onEdit={() => {
+                            setEditingTaskId(item.id);
+                            setNewName(item.name);
+                            setNewDescription(item.description ?? "");
+                            setShowCreateModal(true);
+                        }}
                         onDelete={() => onDelete(item.id)}
                     />
                 )}
@@ -118,9 +114,8 @@ export default function TasksForList() {
                                     key={l.id}
                                     onPress={() => {
                                         if (!moveTaskId) return;
-                                        moveTask(moveTaskId, l.id);
+                                        move(moveTaskId, l.id);
                                         setMoveTaskId(null);
-                                        refresh();
                                     }}
                                     style={styles.modalListItem}
                                 >
@@ -139,7 +134,12 @@ export default function TasksForList() {
 
             <Button
                 title="Create Task"
-                onPress={() => setShowCreateModal(true)}
+                onPress={() => {
+                    setEditingTaskId(null);
+                    setNewName("");
+                    setNewDescription("");
+                    setShowCreateModal(true);
+                }}
                 style={{
                     marginTop: SPACING.sm,
                     paddingHorizontal: SPACING.lg,
@@ -154,11 +154,11 @@ export default function TasksForList() {
             <Modal visible={showCreateModal} transparent animationType="fade" onRequestClose={() => setShowCreateModal(false)}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.formTitle}>Create Task</Text>
+                        <Text style={styles.formTitle}>{editingTaskId !== null ? 'Edit Task' : 'Create Task'}</Text>
                         <TextInput placeholder="Name" value={newName} onChangeText={setNewName} style={styles.input} />
                         <TextInput placeholder="Description" value={newDescription} onChangeText={setNewDescription} style={[styles.input, styles.textarea]} multiline />
                         <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                            <Button title="Create" onPress={onCreate} style={{ paddingHorizontal: SPACING.lg }} />
+                            <Button title={editingTaskId !== null ? 'Save' : 'Create'} onPress={onSubmit} style={{ paddingHorizontal: SPACING.lg }} />
                             <Button title="Cancel" onPress={() => { setNewName(''); setNewDescription(''); setShowCreateModal(false); }} style={{ backgroundColor: '#ccc' }} />
                         </View>
                     </View>
