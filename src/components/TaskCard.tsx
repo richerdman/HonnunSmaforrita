@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { COLORS, FONT_SIZES, SPACING } from "../constants/theme";
-import type { Task } from "../services/taskService";
+import type { Task } from "../types/types";
 
 type Props = {
   task: Task;

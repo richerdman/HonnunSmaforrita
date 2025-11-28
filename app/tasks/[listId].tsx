@@ -4,6 +4,7 @@ import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, Vi
 import Button from "../../src/components/button";
 import TaskCard from "../../src/components/TaskCard";
 import { SPACING } from "../../src/constants/theme";
+import { Task } from "../../src/types/types";
 import {
     createTask,
     deleteTask,
@@ -11,7 +12,6 @@ import {
     getLists,
     getTasksByList,
     moveTask,
-    Task,
     toggleTaskFinished,
 } from "../../src/services/taskService";
 import styles from "../../src/views/tasks/styles";

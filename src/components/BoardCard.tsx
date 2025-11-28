@@ -7,9 +7,12 @@ import { Board } from "../types/types";
 type BoardCardProps = {
     board: Board;
     onPress: () => void;
+    onDelete: (id: number) => void;
+    onEdit: (id: number) => void;
 };
 
-export default function BoardCard({ board, onPress }: BoardCardProps) {
+
+export default function BoardCard({ board, onPress, onDelete, onEdit }: BoardCardProps) {
     return (
         <TouchableOpacity 
             style={[styles.card, {borderLeftColor: COLORS.primary}]}
@@ -23,7 +26,24 @@ export default function BoardCard({ board, onPress }: BoardCardProps) {
                 <Text style={styles.name}>{board.name}</Text>
                 <Text style={styles.description}>{board.description}</Text>
             </View>
-            <Text style = {styles.arrow}>→</Text>
+
+            <TouchableOpacity 
+                style={styles.editButton}
+                onPress={(e) => {
+                    e?.stopPropagation?.();
+                    onEdit(board.id);
+                  }}
+            >
+                <Text style={styles.editText}>Edit</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                
+                style={styles.deleteButton}
+                onPress={() => onDelete(board.id)}
+            >
+                <Text style = {styles.deleteText}>Delete</Text>
+            </TouchableOpacity>
         </TouchableOpacity>
     );
 }
@@ -56,7 +76,7 @@ const styles = StyleSheet.create({
         marginBottom: SPACING.xs,
     },
     description: {
-        fontSize: 20,
+        fontSize: FONT_SIZES.small,
         color: COLORS.border,
         marginLeft: SPACING.sm,
     },
@@ -72,5 +92,27 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 4,
+    },
+    deleteButton: {
+        marginLeft: SPACING.md,
+        padding: SPACING.xs,
+        backgroundColor: "#ff4d4d",
+        borderRadius: 4,
+    },
+    deleteText: {
+        color: COLORS.white,
+        fontSize: FONT_SIZES.small,
+        fontWeight: "600",
+    },
+    editButton: {
+        marginLeft: SPACING.md,
+        padding: SPACING.xs,
+        backgroundColor: COLORS.primary,
+        borderRadius: 4,
+    },
+    editText: {
+        color: COLORS.white,
+        fontSize: FONT_SIZES.small,
+        fontWeight: "600",
     },
 });

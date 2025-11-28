@@ -10,13 +10,20 @@ import { Board } from "../src/types/types";
 // 
 export default function BoardsScreen() {
     const router = useRouter();
-    const { boards } = useBoards();
+    const { boards, removeBoard } = useBoards();
 
     const renderBoard: ListRenderItem<Board> = ({ item }) => (
         <BoardCard
         board={item}
         onPress={() => {
             router.push(`/lists?boardId=${item.id}`);
+        }}
+        onDelete={(id)=>{
+            console.log("Deleting board with id:", id);
+            removeBoard(id);
+        }}
+        onEdit={(id) => {
+            router.push(`/editBoard?boardId=${id}`);
         }}
         />
     );
@@ -37,7 +44,7 @@ export default function BoardsScreen() {
             style={styles.addButton}
             onPress={() => router.push("/createBoard")}
             >
-                <Text style={styles.addButtonText}>+</Text>
+                <Text style={styles.addButtonText}>Create Board</Text>
             </TouchableOpacity>
         </View>
     );
@@ -58,14 +65,12 @@ const styles = StyleSheet.create({
         marginTop: SPACING.lg,
     },
     addButton: {
-        position: "absolute",
-        bottom: SPACING.lg,
-        right: SPACING.lg,
+        marginTop: SPACING.md,
+        marginBottom: SPACING.md,
+        marginHorizontal: SPACING.md,
+        paddingVertical: SPACING.md,
         backgroundColor: COLORS.primary,
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        justifyContent: "center",
+        borderRadius: 5,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -75,7 +80,7 @@ const styles = StyleSheet.create({
     },
     addButtonText: {
         color: COLORS.white,
-        fontSize: 32,
+        fontSize: 18,
         fontWeight: "bold",
     },
 });

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import Button from "../src/components/button";
 import { COLORS, FONT_SIZES, SPACING } from "../src/constants/theme";
+import { createBoard } from "../src/services/boardServices";
 
 export default function CreateBoardScreen() {
     const router = useRouter();
@@ -14,6 +15,8 @@ export default function CreateBoardScreen() {
             Alert.alert("Validation Error", "Board name is required.");
             return;
         }
+
+        createBoard({ name: name.trim(), description: description.trim() });
 
         console.log("Creating board:", { name, description });
         Alert.alert("Board created successfully!");

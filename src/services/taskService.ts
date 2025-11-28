@@ -1,26 +1,5 @@
 import rawData from '../data/data.json';
-
-export type Board = {
-  id: number;
-  name: string;
-  description?: string;
-  thumbnailPhoto?: string;
-};
-
-export type List = {
-  id: number;
-  name: string;
-  color: string;
-  boardId: number;
-};
-
-export type Task = {
-  id: number;
-  name: string;
-  description?: string;
-  isFinished: boolean;
-  listId: number;
-};
+import type { Board, List, Task } from '../types/types';
 
 type DataShape = {
   boards: Board[];
@@ -83,5 +62,5 @@ export function deleteTask(taskId: number) {
 }
 
 export function getListsForBoard(boardId: number) {
-  return data.lists.filter((l) => l.boardId === boardId).slice();
+    return data.lists.filter((l) => l.boardId === boardId).slice();
 }
