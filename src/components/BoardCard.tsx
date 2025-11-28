@@ -1,7 +1,7 @@
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { COLORS, FONT_SIZES, SPACING } from "../constants/theme";
-import { Board } from "../types";
+import { Board } from "../types/types";
 
 
 type BoardCardProps = {

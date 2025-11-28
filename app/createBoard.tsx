@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import Button from "../components/button";
-import { COLORS, SPACING, FONT_SIZES } from "../constants/theme";
+import React, { useState } from "react";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import Button from "../src/components/button";
+import { COLORS, FONT_SIZES, SPACING } from "../src/constants/theme";
 
 export default function CreateBoardScreen() {
     const router = useRouter();

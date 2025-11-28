@@ -1,6 +1,6 @@
 import { useState } from "react";
 import boardsData from "../data/data.json";
-import { Board } from "../types";
+import { Board } from "../types/types";
 
 export function useBoards() {
     const [boards, setBoards] = useState<Board[]>(boardsData.boards as Board[]);

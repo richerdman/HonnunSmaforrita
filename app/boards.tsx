@@ -1,10 +1,10 @@
-import React from "react";
-import { View, FlatList, Text, StyleSheet, ListRenderItem, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { Board } from "../types";
-import BoardCard from "../components/BoardCard";
-import { useBoards } from "../hooks/useBoards";
-import { COLORS, SPACING, FONT_SIZES } from "../constants/theme";
+import React from "react";
+import { FlatList, ListRenderItem, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import BoardCard from "../src/components/BoardCard";
+import { COLORS, FONT_SIZES, SPACING } from "../src/constants/theme";
+import { useBoards } from "../src/hooks/useBoards";
+import { Board } from "../src/types/types";
 
 
 // 
