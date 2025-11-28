@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { COLORS, FONT_SIZES, SPACING } from "../../constants/theme";
 import type { Task } from "../../services/taskService";
-import { COLORS, SPACING } from "../../src/../constants/theme";
 import OverflowMenu from "../overflowMenu/overflowMenu";
 import styles from './styles';
 
@@ -55,6 +55,19 @@ export default function TaskCard({
                     {task.description ? (
                         <Text style={styles.desc}>{task.description}</Text>
                     ) : null}
+                    {task.dueDate ? (() => {
+                        const d = new Date(task.dueDate);
+                        if (!isNaN(d.getTime())) {
+                            return (
+                                <View style={{ marginTop: 4 }}>
+                                    <Text style={{ color: COLORS.textSecondary, fontSize: FONT_SIZES.small }}>
+                                        Due: {d.toLocaleDateString()}
+                                    </Text>
+                                </View>
+                            );
+                        }
+                        return null;
+                    })() : null}
                 </View>
             </View>
 
