@@ -9,17 +9,15 @@ export default StyleSheet.create({
     backgroundColor: 'transparent',
   },
   menuDots: {
-    fontSize: 20,
-    lineHeight: 20,
+    fontSize: 22,
+    lineHeight: 22,
     color: COLORS.textSecondary,
   },
   menu: {
     position: 'absolute',
-    right: 400,
-    top: 36,
     backgroundColor: COLORS.white,
     borderRadius: 8,
-    minWidth: 150,
+    minWidth: 200,
     // shadow on iOS
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -36,11 +34,11 @@ export default StyleSheet.create({
     backgroundColor: COLORS.white,
     overflow: 'hidden',
     paddingVertical: 6,
-    minWidth: 150,
+    minWidth: 200,
   },
   menuItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
   },
   menuText: {
     color: COLORS.textPrimary,

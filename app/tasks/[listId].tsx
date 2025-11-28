@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Button from "../../src/components/button";
+import OverflowMenu from "../../src/components/overflowMenu/overflowMenu";
 import TaskCard from "../../src/components/taskCard/TaskCard";
 import { SPACING } from "../../src/constants/theme";
 import { getListByIdFromStore, useAllLists } from "../../src/hooks/useLists";
@@ -20,6 +21,7 @@ export default function TasksForList() {
     const [errorMsg, setErrorMsg] = useState("");
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+    const [showCompleted, setShowCompleted] = useState(true);
     const { tasks, createTask, edit, toggle, move, remove } = useTasks(listId);
 
     function onToggle(id: number) {
@@ -27,7 +29,6 @@ export default function TasksForList() {
     }
 
     function onSubmit() {
-        // validate due date (optional) - must be YYYY-MM-DD if provided
         const due = newDueDate?.trim();
         if (due) {
             const isIso = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(due);
@@ -102,10 +103,21 @@ export default function TasksForList() {
     return (
         <View style={styles.container}>
 
-            <Text style={styles.title}>{list?.name ?? `List ${listId}`}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={styles.title}>{list?.name ?? `List ${listId}`}</Text>
+                <OverflowMenu
+                    items={[
+                        {
+                            label: showCompleted ? 'Hide completed' : 'Show completed',
+                            onPress: () => setShowCompleted((s) => !s),
+                        },
+                    ]}
+                    buttonStyle={{ marginRight: SPACING.md, marginTop: SPACING.xs }}
+                />
+            </View>
 
             <FlatList
-                data={tasks}
+                data={tasks.filter((t) => showCompleted || !t.isFinished)}
                 keyExtractor={(t) => String(t.id)}
                 renderItem={({ item }) => (
                     <TaskCard
