@@ -4,8 +4,9 @@ import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, Vi
 import Button from "../../src/components/button";
 import TaskCard from "../../src/components/taskCard/TaskCard";
 import { SPACING } from "../../src/constants/theme";
+import { getListByIdFromStore, useAllLists } from "../../src/hooks/useLists";
 import { useTasks } from "../../src/hooks/useTasks";
-import { getListById, getLists } from "../../src/services/taskService";
+import { getListById as getListByIdFromService } from "../../src/services/taskService";
 import styles from "../../src/views/tasks/styles";
 
 export default function TasksForList() {
@@ -72,7 +73,9 @@ export default function TasksForList() {
         );
     }
 
-    const list = getListById(listId);
+    // prefer hook-backed list lookup so newly created lists are visible
+    const list = getListByIdFromStore(listId) ?? getListByIdFromService(listId);
+    const { lists: allLists } = useAllLists();
 
     return (
         <View style={styles.container}>
@@ -107,7 +110,7 @@ export default function TasksForList() {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalHeader}>Move task to...</Text>
-                        {getLists()
+                        {allLists
                             .filter((l) => l.id !== listId)
                             .map((l) => (
                                 <TouchableOpacity

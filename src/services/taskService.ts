@@ -1,5 +1,5 @@
 import rawData from '../data/data.json';
-import type { Board, List } from '../types';
+import type { Board, List } from '../types/types';
 
 export type Task = {
     id: number;

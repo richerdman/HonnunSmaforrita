@@ -1,15 +1,15 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    FlatList,
-    Modal,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+	Alert,
+	FlatList,
+	Modal,
+	Platform,
+	Pressable,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
 } from "react-native";
 
 import Button from "../src/components/button";
@@ -17,6 +17,7 @@ import ListCard from "../src/components/ListCard";
 import { COLORS, FONT_SIZES, SPACING } from "../src/constants/theme";
 import { useLists } from "../src/hooks/useLists";
 import { List } from "../src/types/types";
+
 
 type Params = {
     boardId?: string;

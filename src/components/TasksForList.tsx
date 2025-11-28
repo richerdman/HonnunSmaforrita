@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
     FlatList,
     Modal,
@@ -7,17 +7,21 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import TaskCard from "../components/taskCard/TaskCard";
 import { SPACING } from "../constants/theme";
+import { useLists } from "../hooks/useLists";
 import { useTasks } from "../hooks/useTasks";
 import type { Task } from "../services/taskService";
-import { getListById, getLists } from "../services/taskService";
+import { getListById } from "../services/taskService";
 import styles from "../views/tasks/styles";
 import Button from "./button";
-import TaskCard from "./taskCard/TaskCard";
 
 type Props = { listId: number; showHeader?: boolean };
 
 export default function TasksForList({ listId, showHeader = true }: Props) {
+    const list = getListById(listId);
+    const boardId = list ? list.boardId : 0;
+    const { lists } = useLists(boardId);
     const { tasks, createTask, edit, toggle, move, remove } = useTasks(listId);
     const [openForm, setOpenForm] = useState(false);
     const [newName, setNewName] = useState("");
@@ -25,7 +29,6 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
     const [moveTaskId, setMoveTaskId] = useState<number | null>(null);
     const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
-    const list = getListById(listId);
 
     function onSubmitForm() {
         if (!newName.trim()) return;
@@ -151,7 +154,7 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
                     <Text style={{ fontWeight: "700", marginBottom: 6 }}>
                         Move task to...
                     </Text>
-                    {getLists()
+                    {lists
                         .filter((l) => l.id !== listId)
                         .map((l) => (
                             <TouchableOpacity
