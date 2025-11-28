@@ -4,16 +4,8 @@ import { Alert, FlatList, Modal, Platform, Text, TextInput, TouchableOpacity, Vi
 import Button from "../../src/components/button";
 import TaskCard from "../../src/components/taskCard/TaskCard";
 import { SPACING } from "../../src/constants/theme";
-import {
-    createTask,
-    deleteTask,
-    getListById,
-    getLists,
-    getTasksByList,
-    moveTask,
-    Task,
-    toggleTaskFinished,
-} from "../../src/services/taskService";
+import { useTasks } from "../../src/hooks/useTasks";
+import { getListById, getLists } from "../../src/services/taskService";
 import styles from "../../src/views/tasks/styles";
 
 export default function TasksForList() {
