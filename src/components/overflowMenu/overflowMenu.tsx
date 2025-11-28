@@ -1,20 +1,25 @@
 import React, { useRef, useState } from "react";
 import {
-	Modal,
-	Text,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	View,
+    Modal,
+    Text,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
 import styles from "./styles";
 
+type MenuItem = { label: string; onPress?: () => void; destructive?: boolean; isHeader?: boolean };
+
 type Props = {
-    onMove: () => void;
+    onMove?: () => void;
     onEdit?: () => void;
-    onDelete: () => void;
+    onDelete?: () => void;
+    // optionally provide custom menu items
+    items?: MenuItem[];
+    buttonStyle?: any;
 };
 
-export default function OverflowMenu({ onMove, onEdit, onDelete }: Props) {
+export default function OverflowMenu({ onMove, onEdit, onDelete, items, buttonStyle }: Props) {
     const [open, setOpen] = useState(false);
     const [pos, setPos] = useState<{
         x: number;
@@ -44,7 +49,7 @@ export default function OverflowMenu({ onMove, onEdit, onDelete }: Props) {
             <TouchableOpacity
                 ref={btnRef}
                 onPress={openMenu}
-                style={styles.menuButton}
+                style={[styles.menuButton, buttonStyle]}
                 accessibilityLabel="Open actions"
             >
                 <Text style={styles.menuDots}>⋯</Text>
@@ -63,57 +68,71 @@ export default function OverflowMenu({ onMove, onEdit, onDelete }: Props) {
                                 style={[
                                     styles.menu,
                                     {
-                                        left: Math.max(8, pos.x + pos.w - 150),
+                                        left: Math.max(8, pos.x + pos.w - 200),
                                         top: pos.y + pos.h + 6,
                                     },
                                 ]}
                             >
                                 <View style={styles.menuInner}>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            closeMenu();
-                                            onMove();
-                                        }}
-                                        style={styles.menuItem}
-                                    >
-                                        <Text style={styles.menuText}>
-                                            Move
-                                        </Text>
-                                    </TouchableOpacity>
+                                    {items && items.length > 0 ? (
+                                        items.map((it: MenuItem, idx: number) => (
+                                            it.isHeader ? (
+                                                <View key={idx} style={styles.menuHeader}>
+                                                    <Text style={styles.menuHeaderText}>{it.label}</Text>
+                                                </View>
+                                            ) : (
+                                                <TouchableOpacity
+                                                    key={idx}
+                                                    onPress={() => {
+                                                        closeMenu();
+                                                        it.onPress && it.onPress();
+                                                    }}
+                                                    style={[
+                                                        styles.menuItem,
+                                                        it.destructive ? styles.menuDeleteItem : undefined,
+                                                    ]}
+                                                >
+                                                    <Text style={[styles.menuText, it.destructive ? styles.deleteTxt : undefined]}>
+                                                        {it.label}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            )
+                                        ))
+                                    ) : (
+                                        <>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    closeMenu();
+                                                    onMove && onMove();
+                                                }}
+                                                style={styles.menuItem}
+                                            >
+                                                <Text style={styles.menuText}>Move</Text>
+                                            </TouchableOpacity>
 
-                                    {onEdit ? (
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                closeMenu();
-                                                onEdit();
-                                            }}
-                                            style={styles.menuItem}
-                                        >
-                                            <Text style={styles.menuText}>
-                                                Edit
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ) : null}
+                                            {onEdit ? (
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        closeMenu();
+                                                        onEdit && onEdit();
+                                                    }}
+                                                    style={styles.menuItem}
+                                                >
+                                                    <Text style={styles.menuText}>Edit</Text>
+                                                </TouchableOpacity>
+                                            ) : null}
 
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            closeMenu();
-                                            onDelete();
-                                        }}
-                                        style={[
-                                            styles.menuItem,
-                                            styles.menuDeleteItem,
-                                        ]}
-                                    >
-                                        <Text
-                                            style={[
-                                                styles.menuText,
-                                                styles.deleteTxt,
-                                            ]}
-                                        >
-                                            Delete
-                                        </Text>
-                                    </TouchableOpacity>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    closeMenu();
+                                                    onDelete && onDelete();
+                                                }}
+                                                style={[styles.menuItem, styles.menuDeleteItem]}
+                                            >
+                                                <Text style={[styles.menuText, styles.deleteTxt]}>Delete</Text>
+                                            </TouchableOpacity>
+                                        </>
+                                    )}
                                 </View>
                             </View>
                         ) : null}

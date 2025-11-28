@@ -24,6 +24,7 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
     const boardId = list ? list.boardId : 0;
     const { lists } = useLists(boardId);
     const { tasks, createTask, edit, toggle, move, remove } = useTasks(listId);
+    const [showCompleted, setShowCompleted] = useState(true);
     const [openForm, setOpenForm] = useState(false);
     const [newName, setNewName] = useState("");
     const [newDescription, setNewDescription] = useState("");
@@ -123,6 +124,17 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
                         {list?.name ?? `List ${listId}`}
                     </Text>
                     <Button
+                        title={showCompleted ? 'Hide completed' : 'Show completed'}
+                        onPress={() => setShowCompleted((s) => !s)}
+                        style={{
+                            paddingHorizontal: SPACING.md,
+                            paddingVertical: SPACING.sm,
+                            alignSelf: "flex-start",
+                            marginLeft: SPACING.md,
+                            marginTop: 8,
+                        }}
+                    />
+                    <Button
                         title="Add task"
                         onPress={() => setOpenForm(true)}
                         style={{
@@ -135,11 +147,11 @@ export default function TasksForList({ listId, showHeader = true }: Props) {
                 </>
             )}
 
-            {tasks.length === 0 ? (
+            {tasks.filter((t) => showCompleted || !t.isFinished).length === 0 ? (
                 <Text style={styles.empty}>No tasks in this list.</Text>
             ) : (
                 <FlatList
-                    data={tasks}
+                    data={tasks.filter((t) => showCompleted || !t.isFinished)}
                     keyExtractor={(t) => String(t.id)}
                     renderItem={renderTask}
                 />
